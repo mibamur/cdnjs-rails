@@ -21,8 +21,13 @@ module CDNJS
 
         window_path.chomp!(" && ")
 
-        js_string_output << javascript_include_tag("//cdnjs.cloudflare.com/ajax/libs/#{js_file_config.fetch(:cdnjs)}")
-        js_string_output << javascript_tag("(#{window_path}) || document.write(unescape(\"%3Cscript src='#{asset_path(js_file_config.fetch(:localpath)).gsub('<','%3C')}' type='text/javascript'%3E%3C/script%3E\"))")
+        # js_string_output << javascript_tag("(#{window_path}) || document.write(unescape(\"%3Cscript src='#{asset_path(js_file_config.fetch(:localpath)).gsub('<','%3C')}' type='text/javascript'%3E%3C/script%3E\"))")
+        if Rails.env.production?
+          js_string_output << javascript_include_tag("//cdnjs.cloudflare.com/ajax/libs/#{js_file_config.fetch(:cdnjs)}")
+        else
+          js_string_output << javascript_tag("document.write(unescape(\"%3Cscript src='#{asset_path(js_file_config.fetch(:localpath)).gsub('<','%3C')}' type='text/javascript'%3E%3C/script%3E\"))")
+        end
+
       end
 
       js_string_output.join("\n").html_safe
